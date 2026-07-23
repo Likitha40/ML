@@ -1,0 +1,27 @@
+import pandas as pd
+df = pd.read_csv("electronic_customer.csv")
+df
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()   # Naivebayes cannot understand text values so we use labelencoder converts then into numbers.
+for column in df.columns:
+     df[column] = le.fit_transform(df[column].astype(str))
+# for each column from the dataset converts everything into strings this avoids errors if a column contains numbers
+# fit_transform: learn all unique values and convert into numbers
+
+X = df.drop("buys_comp", axis=1)  # Attributes
+Y = df["buys_comp"] # ClassLabel
+from sklearn.model_selection import train_test_split   
+X_train, X_test,Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)  
+# 0.3: 30% testdata, 70% trainingdata
+# It is parameter used to control the random splitting of data set. Setting to 42 ensures that the same training and testing data are selected every time. 
+# our dataset contains only categorical values so we used CategoricalNB if continuos values like weight we use GaussainNB
+from sklearn.naive_bayes import CategoricalNB   
+model = CategoricalNB()  # Model created
+model.fit(X_train, Y_train) # Lerning
+
+Y_pred = model.predict(X_test)  # predicts unseen data
+
+from sklearn.metrics import accuracy_score
+print("predicted:", Y_pred)
+print("Actual:", Y_test.values)
+print("Accuracy:",accuracy_score(Y_test, Y_pred))
